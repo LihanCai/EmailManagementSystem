@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Email Inbox</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 15%;
+            height: 100vh;
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            position: fixed;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .content {
+            float: left;
+            width: 85%;
+            padding: 20px;
+            margin-left: 20%;
+        }
+
+        .email-list {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .email-item {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #fff;
+        }
+
+        .email-details {
+            flex: 1;
+        }
+
+        .email-time {
+            width: 30%;
+            text-align: right;
+            color: #666;
+        }
+
+        .contacts-list {
+            background-color: #eee;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                <li><a href="writingemail">写邮件</a></li>
+                <li><a href="receivedemails">收件箱</a></li>
+                <li><a href="draft">草稿箱</a></li>
+                <li><a href="trashemails">垃圾箱</a></li>
+                <li><a href="sentemails">已发送</a></li>
+                <li><a href="deletedemails">已删除</a></li>
+                <li><a href="#">分类</a></li>
+                <li><a href="#">通讯录</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <h2>Write an Email</h2>
+            <form method="post" action="/sendemail">
+                <div class="form-row">
+                    <label for="receiver">Receiver:</label>
+                    <input type="text" id="receiver" name="receiver">
+                </div>
+                <div class="contacts-list">
+                    <ul id="contact-list">
+
+                    </ul>
+                </div>
+                <div class="form-row">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title">
+                </div>
+                <label for="content">Content:</label>
+                <textarea id="content" name="content"></textarea>
+                <div>
+                    <button type="submit">Send</button>
+                    <button id="draftButton">Save as Draft</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 获取通讯录中的联系人列表容器
+            const contactList = document.getElementById('contact-list');
+
+            // 使用 AJAX 请求从后端加载联系人列表
+            fetch('/contacts')
+                .then(response => response.json())
+                .then(contacts => {
+                    // 遍历联系人列表并创建联系人链接元素
+                    contacts.forEach(contact => {
+                        const contactLink = document.createElement('a');
+                        contactLink.href = '#';
+                        contactLink.classList.add('contact-link');
+                        contactLink.setAttribute('data-name', contact.name);
+                        contactLink.textContent = contact.name;
+
+                        // 添加点击事件处理程序（与前面示例相同）
+                        contactLink.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            const contactName = this.getAttribute('data-name'); // 获取联系人名称
+                            // 检查联系人是否已添加（与前面示例相同）
+                            if (!addedContacts.has(contactName)) {
+                                addedContacts.add(contactName);
+                                const currentReceiver = receiverInput.value;
+                                // 检查receiver文本输入框中是否已有内容，如果有，则添加分号和空格
+                                const separator = currentReceiver.trim() === '' ? '' : '; ';
+                                receiverInput.value += separator + contactName;
+                            }
+                        });
+
+                        // 将联系人链接添加到联系人列表容器
+                        contactList.appendChild(contactLink);
+                    });
+                })
+                .catch(error => {
+                    console.error('Failed to load contacts:', error);
+                });
+        });
+    </script>
+</body>
+
+</html>
