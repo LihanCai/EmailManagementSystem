@@ -57,16 +57,6 @@
             margin-bottom: 10px;
             background-color: #fff;
         }
-
-        .email-details {
-            flex: 1;
-        }
-
-        .email-time {
-            width: 30%;
-            text-align: right;
-            color: #666;
-        }
     </style>
 </head>
 
@@ -82,39 +72,69 @@
                 <!-- <li><a href="deletedemails">已删除</a></li> -->
                 <!-- <li><a href="#">分类</a></li> -->
                 <li><a href="contacts">通讯录</a></li>
+
             </ul>
         </div>
         <div class="content">
-            <h1>已发送</h1>
+            <h1>Contacts</h1>
             <div class="button-group">
-                <!-- 其他按钮可以继续添加 -->
+                <button id="addButton" onclick="promptToAddContact()">add a contact</button>
             </div>
             <ul>
-                <% emails.forEach(function(email) { %>
+                <% contacts.forEach(function(contact) { %>
                     <li class="email-item">
-                        <input type="checkbox" name="selectedEmails" value="<%= email.id %>" />
+                        <!-- 修改邮件项的复选框 -->
+                        <!-- <button id="writingemailButton" onclick="writingemail">writing an email</button> -->
 
-                        <div class="email-details">
-                            <h3>
-                                <a href="/detailedemail?emailid=<%= email.email_id %>">
-                                    <%= email.title %>
-                                </a>
-                            </h3>
-                            <p>
-                                <%= email.content %>
-                            </p>
-                        </div>
-                        <div class="email-time">
-                            <p>发送时间: <%= email.sending_time %>
-                            </p>
-                        </div>
+                        <p>
+                            <%= contact.username %>
+                        </p>
+                        <p>
+                            <%= contact.email %>
+                        </p>
+                        <p>
+                            <%= contact.phone %>
+                        </p>
+                        <p>
+                            <%= contact.address %>
+                        </p>
+                        <p>
+                            <%= contact.birthday %>
+                        </p>
                     </li>
                     <% }); %>
             </ul>
-
-
         </div>
     </div>
+
+
+    <script>
+        // JavaScript 函数来弹出对话框并添加联系人
+        // JavaScript 函数来弹出对话框并添加联系人
+        function promptToAddContact() {
+            var contactInfo = window.prompt("Enter contact information (username, email, phone, address, birthday) separated by commas:");
+
+            if (contactInfo) {
+                var contactData = contactInfo.split(',');
+                if (contactData.length === 5) {
+                    var username = contactData[0].trim();
+                    var email = contactData[1].trim();
+                    var phone = contactData[2].trim();
+                    var address = contactData[3].trim();
+                    var birthday = contactData[4].trim();
+
+                    // 在这里可以将输入的信息添加到联系人列表中或进行其他处理
+                    // 你可以将它们添加到联系人列表中
+                } else {
+                    alert("Please enter all contact information separated by commas.");
+                }
+            }
+        }
+    </script>
+    </script>
+
+
 </body>
+
 
 </html>

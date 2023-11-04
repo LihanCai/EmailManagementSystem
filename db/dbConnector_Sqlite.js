@@ -158,6 +158,32 @@ async function checkFolders(user_id) {
   return folders;
 }
 
+//查看联系人
+async function checkContacts(user_id) {
+  const db = await connect();
+  const contacts = await db.all(
+    `SELECT * 
+    FROM Connects 
+    WHERE user_id = ?;`, [user_id]
+  );
+  return contacts;
+}
+
+// Function to add a new contact to the Connects table
+async function addContact(username, email, phone, address, birthday, userId) {
+  const db = await connect();
+
+  // Insert the contact data into the Connects table
+  await db.run(`
+    INSERT INTO Connects (username, email, phone, address, birthday, user_id)
+    VALUES (?, ?, ?, ?, ?, ?);
+  `, [username, email, phone, address, birthday, userId]);
+
+  // Close the database connection
+  await db.close();
+}
+
+
 module.exports = {
   // 登录验证函数
   verifyLogin,
@@ -168,5 +194,7 @@ module.exports = {
   checktrashemails,
   checksentemails,
   deleteEmails,
-  checkFolders
+  checkFolders,
+  checkContacts,
+  addContact,
 };

@@ -1,6 +1,6 @@
 let express = require("express");
 let router = express.Router();
-const { checkFolders,deleteEmails,checksentemails,checktrashemails,checkDeletedemails,findemail, checkDrafts, checkReceivedEmails,verifyLogin } = require("../db/dbConnector_Sqlite.js");
+const { checkContacts,checkFolders,deleteEmails,checksentemails,checktrashemails,checkDeletedemails,findemail, checkDrafts, checkReceivedEmails,verifyLogin } = require("../db/dbConnector_Sqlite.js");
 
 /* GET home page. */
 router.get("/", async function (req, res) {
@@ -165,6 +165,17 @@ router.get('/folders',async function(req, res, next) {
   // console.log(emails);
   // 渲染邮件页面，并将邮件数据传递给视图
 res.render('folders', {folders: folders})
+})
+
+// contacts page
+router.get('/contacts',async function(req, res, next) {
+  // 查询用户的邮件
+  const userid  = req.session.userId;
+  // 使用数据库模块进行登录验证
+  const contacts = await checkContacts(userid);
+  // console.log(emails);
+  // 渲染邮件页面，并将邮件数据传递给视图
+res.render('contacts', {contacts: contacts})
 })
 
 module.exports = router;
