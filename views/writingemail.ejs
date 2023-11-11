@@ -108,8 +108,8 @@
                 <label for="content">Content:</label>
                 <textarea id="content" name="content"></textarea>
                 <div>
-                    <button type="submit">Send</button>
-                    <button id="draftButton">Save as Draft</button>
+                    <button type="submit" id="sendButton">Send</button>
+                    <!-- <button id="draftButton">Save as Draft</button> -->
                 </div>
             </form>
         </div>
@@ -117,43 +117,34 @@
 
 
     <script>
+        // 前端JavaScript
         document.addEventListener('DOMContentLoaded', function () {
-            // 获取通讯录中的联系人列表容器
-            const contactList = document.getElementById('contact-list');
+            const sendButton = document.getElementById('sendButton');
 
-            // 使用 AJAX 请求从后端加载联系人列表
-            fetch('/contacts')
-                .then(response => response.json())
-                .then(contacts => {
-                    // 遍历联系人列表并创建联系人链接元素
-                    contacts.forEach(contact => {
-                        const contactLink = document.createElement('a');
-                        contactLink.href = '#';
-                        contactLink.classList.add('contact-link');
-                        contactLink.setAttribute('data-name', contact.name);
-                        contactLink.textContent = contact.name;
+            sendButton.addEventListener('click', function (event) {
+                event.preventDefault();
 
-                        // 添加点击事件处理程序（与前面示例相同）
-                        contactLink.addEventListener('click', function (event) {
-                            event.preventDefault();
-                            const contactName = this.getAttribute('data-name'); // 获取联系人名称
-                            // 检查联系人是否已添加（与前面示例相同）
-                            if (!addedContacts.has(contactName)) {
-                                addedContacts.add(contactName);
-                                const currentReceiver = receiverInput.value;
-                                // 检查receiver文本输入框中是否已有内容，如果有，则添加分号和空格
-                                const separator = currentReceiver.trim() === '' ? '' : '; ';
-                                receiverInput.value += separator + contactName;
-                            }
-                        });
+                const formData = {
+                    receiver: document.getElementById('receiver').value,
+                    title: document.getElementById('title').value,
+                    content: document.getElementById('content').value
+                };
 
-                        // 将联系人链接添加到联系人列表容器
-                        contactList.appendChild(contactLink);
-                    });
+                fetch('/sendemail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
                 })
-                .catch(error => {
-                    console.error('Failed to load contacts:', error);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+            });
         });
     </script>
 </body>

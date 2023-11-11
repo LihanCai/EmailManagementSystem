@@ -13,6 +13,7 @@ async function verifyLogin(username, password) {
   const user = await db.get(
     "SELECT * FROM Users WHERE username = ? AND password = ?;", [username, password]
   );
+  await db.close();
   // console.log(user);
   return user;
 }
@@ -28,6 +29,7 @@ async function checkReceivedEmails(user_id) {
     WHERE e.receiver_id = ? 
     AND f.folderName = 'sent'`, [user_id]
   );
+  await db.close();
   // console.log(emails);
   return emails;
 }
@@ -42,6 +44,7 @@ async function checkDrafts(user_id) {
     WHERE e.sender_id = ? 
     AND f.folderName = 'draft'`, [user_id]
   );
+  await db.close();
   // console.log(emails);
   return emails;
 }
@@ -56,6 +59,7 @@ async function checkDeletedemails(user_id) {
     WHERE e.sender_id = ? 
     AND f.folderName = 'deleted'`, [user_id]
   );
+  await db.close();
   // console.log(emails);
   return emails;
 }
@@ -66,6 +70,7 @@ async function findemail(email_id) {
   const email = await db.get(
     "SELECT * FROM Emails WHERE email_id = ?;", [email_id]
   );
+  await db.close();
   return email;
 }
 
@@ -80,6 +85,7 @@ async function checktrashemails(user_id) {
     WHERE e.sender_id = ? 
     AND f.folderName = 'trash'`, [user_id]
   );
+  await db.close();
   // console.log(emails);
   return emails;
 }
@@ -95,6 +101,7 @@ async function checksentemails(user_id) {
     AND f.folderName = 'trash'`, [user_id]
   );
   // console.log(emails);
+  await db.close();
   return emails;
 }
 
@@ -155,6 +162,7 @@ async function checkFolders(user_id) {
     WHERE f.user_id = ? 
     AND f.folderName NOT IN ('trash', 'delete', 'draft', 'sent')`, [user_id]
   );
+  await db.close();
   return folders;
 }
 
@@ -166,7 +174,32 @@ async function checkContacts(user_id) {
     FROM Connects 
     WHERE user_id = ?;`, [user_id]
   );
+  await db.close();
   return contacts;
+}
+
+//获取收件人
+async function getReceiver(receiver) {
+  const db = await connect();
+  const receiver_id = await db.get(
+    `SELECT user_id 
+    FROM Users 
+    WHERE email = ?;`, [receiver]
+  );
+  await db.close();
+  return receiver_id
+}
+
+
+//发送邮件
+async function sendemail(title, sender_id, created_time, sending_time, content,  receiver_id) {
+  const db = await connect();
+  const email = await db.all(
+    `INSERT INTO Emails (title, sender_id, created_time, sending_time, content,  receiver_id)
+    VALUES (?, ?, ?, ?, ?, ?);
+    `, [title, sender_id, created_time, sending_time, content,  receiver_id]
+  );
+  await db.close();
 }
 
 // Function to add a new contact to the Connects table
@@ -197,4 +230,6 @@ module.exports = {
   checkFolders,
   checkContacts,
   addContact,
+  sendemail,
+  getReceiver,
 };
