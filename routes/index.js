@@ -1,6 +1,6 @@
 let express = require("express");
 let router = express.Router();
-const { getReceiver,sendemail,checkContacts,checkFolders,deleteEmails,checksentemails,checktrashemails,checkDeletedemails,findemail, checkDrafts, checkReceivedEmails,verifyLogin } = require("../db/dbConnector_Sqlite.js");
+const { addContact,getReceiver,sendemail,checkContacts,checkFolders,deleteEmails,checksentemails,checktrashemails,checkDeletedemails,findemail, checkDrafts, checkReceivedEmails,verifyLogin } = require("../db/dbConnector_Sqlite.js");
 
 /* GET home page. */
 router.get("/", async function (req, res) {
@@ -192,6 +192,25 @@ router.post('/sendemail',async function(req, res, next) {
   const email = await sendemail(title, userid, created_time, sending_time, content,  receiver_id);
   // 渲染邮件页面，并将邮件数据传递给视图
   res.render('writingemail', {currentPage: 'writingemail'})
+})
+
+router.post('/addcontact',async function(req, res, next) {
+  try {
+  // 查询用户的邮件
+  const userid  = req.session.userId;
+  // 使用数据库模块进行登录验证
+  const { username,email,phone,address,birthday} = req.body;
+  
+  await addContact(username, email, phone, address, birthday, userid);
+
+  const updatedContacts  = await checkContacts(userid);
+  // 渲染邮件页面，并将邮件数据传递给视图
+  res.render('contacts', { contacts: updatedContacts  });
+  } catch (error) {
+    // 处理错误，你可以根据实际情况进行适当的错误处理
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
 })
 
 module.exports = router;

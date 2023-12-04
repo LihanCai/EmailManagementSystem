@@ -98,7 +98,7 @@ async function checksentemails(user_id) {
     INNER JOIN EmailFolderMapping efm ON e.email_id = efm.email_id 
     INNER JOIN Folders f ON efm.folder_id = f.folder_id 
     WHERE e.sender_id = ? 
-    AND f.folderName = 'trash'`, [user_id]
+    AND f.folderName = 'sent'`, [user_id]
   );
   // console.log(emails);
   await db.close();
@@ -208,7 +208,7 @@ async function addContact(username, email, phone, address, birthday, userId) {
 
   // Insert the contact data into the Connects table
   await db.run(`
-    INSERT INTO Connects (username, email, phone, address, birthday, user_id)
+    INSERT INTO Connects (contactname, email, phone, address, birthday, user_id)
     VALUES (?, ?, ?, ?, ?, ?);
   `, [username, email, phone, address, birthday, userId]);
 
