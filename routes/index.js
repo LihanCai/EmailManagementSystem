@@ -1,6 +1,6 @@
 let express = require("express");
 let router = express.Router();
-const { addContact,getReceiver,sendemail,checkContacts,checkFolders,deleteEmails,checksentemails,checktrashemails,checkDeletedemails,findemail, checkDrafts, checkReceivedEmails,verifyLogin } = require("../db/dbConnector_Sqlite.js");
+const { updateContact,addContact,getReceiver,sendemail,checkContacts,checkFolders,deleteEmails,checksentemails,checktrashemails,checkDeletedemails,findemail, checkDrafts, checkReceivedEmails,verifyLogin } = require("../db/dbConnector_Sqlite.js");
 
 /* GET home page. */
 router.get("/", async function (req, res) {
@@ -213,5 +213,23 @@ router.post('/addcontact',async function(req, res, next) {
     res.status(500).send('Internal Server Error');
   }
 })
+
+router.post('/updateContact', async function(req, res, next) {
+  try {
+    const userid = req.session.userId;
+    const { username, email, phone, address, birthday, id } = req.body;
+  
+    await updateContact(username, email, phone, address, birthday, id, userid);
+
+    const updatedContacts = await checkContacts(id);
+
+    // 返回 JSON 格式的响应
+    res.json({ contacts: updatedContacts });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 module.exports = router;

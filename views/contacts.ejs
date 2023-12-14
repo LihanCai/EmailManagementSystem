@@ -105,9 +105,9 @@
             <!-- 联系人列表 -->
             <ul id="contactList">
                 <% contacts.forEach(function(contact) { %>
-                    <li class="email-item" id="contact-<%= contact.id %>">
+                    <li class="email-item" id="contact-<%= contact.connect_id %>">
                         <p>
-                            <%= contact.username %>
+                            <%= contact.contactname %>
                         </p>
                         <p>
                             <%= contact.email %>
@@ -121,7 +121,7 @@
                         <p>
                             <%= contact.birthday %>
                         </p>
-                        <button onclick="editContact('<%= contact.id %>')">Edit</button>
+                        <button onclick="editContact('<%= contact.connect_id %>')">Edit</button>
                     </li>
                     <% }); %>
             </ul>
@@ -181,26 +181,32 @@
 
         function editContact(contactId) {
             var form = document.getElementById('editContactForm');
-            if (form.style.display === 'block' && currentEditingId === contactId) {
-                form.style.display = 'none';
-                currentEditingId = null;
-                return;
-            }
+            var isSameContact = currentEditingId === contactId;
+            // console.log(contactId)
 
-            currentEditingId = contactId;
-
+            // 获取点击的联系人的信息
             var contactItem = document.getElementById('contact-' + contactId);
             var contactDetails = contactItem.getElementsByTagName('p');
 
+            // 填充表单
             document.getElementById('editUsernameInput').value = contactDetails[0].innerText;
             document.getElementById('editEmailInput').value = contactDetails[1].innerText;
             document.getElementById('editPhoneInput').value = contactDetails[2].innerText;
             document.getElementById('editAddressInput').value = contactDetails[3].innerText;
             document.getElementById('editBirthdayInput').value = contactDetails[4].innerText;
             document.getElementById('editContactId').value = contactId;
+            // console.log(document.getElementById('editContactId').value)
 
-            form.style.display = 'block';
+            // 根据是否是同一个联系人来显示或隐藏表单
+            if (form.style.display === 'block' && isSameContact) {
+                form.style.display = 'none';
+                currentEditingId = null;
+            } else {
+                form.style.display = 'block';
+                currentEditingId = contactId;
+            }
         }
+
 
         function submitEditForm() {
             var contactId = document.getElementById('editContactId').value;
@@ -212,17 +218,21 @@
                 address: document.getElementById('editAddressInput').value,
                 birthday: document.getElementById('editBirthdayInput').value
             };
-
-            // 发送 AJAX 请求以更新联系人信息
-            // 请替换 '/updateContact' 为您的 API 端点
             fetch('/updateContact', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(updatedContact),
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                if (response.headers.get('content-type').indexOf('application/json') === -1) {
+                    throw new Error('Response not JSON');
+                }
+                return response.json();
             })
-                .then(response => response.json())
                 .then(data => {
                     console.log('Success:', data);
                     // 更新页面上的联系人信息

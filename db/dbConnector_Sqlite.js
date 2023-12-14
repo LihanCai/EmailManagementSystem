@@ -216,6 +216,22 @@ async function addContact(username, email, phone, address, birthday, userId) {
   await db.close();
 }
 
+async function updateContact(username, email, phone, address, birthday, connectid, userId) {
+  const db = await connect();
+console.log(username);
+console.log(email);
+console.log(userId);
+  // 更新数据库中的联系人信息
+  await db.run(`
+    UPDATE Connects
+    SET contactname = ?, email = ?, phone = ?, address = ?, birthday = ?
+    WHERE connect_id = ? AND user_id = ?;
+  `, [username, email, phone, address, birthday, connectid, userId]);
+
+  // 关闭数据库连接
+  await db.close();
+}
+
 
 module.exports = {
   // 登录验证函数
@@ -232,4 +248,5 @@ module.exports = {
   addContact,
   sendemail,
   getReceiver,
+  updateContact,
 };
