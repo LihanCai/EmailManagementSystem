@@ -185,6 +185,7 @@ router.post('/sendemail',async function(req, res, next) {
   // 使用数据库模块进行登录验证
   const { receiver, title, content } = req.body;
   const obj = await getReceiver(receiver);
+  
   const receiver_id = obj.user_id;
   console.log(receiver_id);
   const created_time = new Date().toISOString(); // 创建邮件的时间
